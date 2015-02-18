@@ -4,27 +4,10 @@ using System.Collections.Generic;
 
 public class GameMap
 {
-	public Bounds bounds;
-
-	public GameObject[] enemyTemplates;
-	public GameObject[] itemTemplates;
-	public GameObject[] floorTemplates;
-	public GameObject[] wallTemplates;
-
-	public GameObject[] roomTemplates;
-
 	public List<Entity> entityInstances = new List<Entity>();
 	public List<Floor> floorInstances = new List<Floor> ();
 	public List<Wall> wallInstances = new List<Wall> ();
 	public List<Item> itemInstances = new List<Item> ();
-
-	public GameMap(GameObject[] floorTemplates, GameObject[] wallTemplates, GameObject[] enemyTemplates, GameObject[] itemTemplates, GameObject[] roomTemplates){
-		this.enemyTemplates = enemyTemplates;
-		this.floorTemplates = floorTemplates;
-		this.wallTemplates = wallTemplates;
-		this.itemTemplates = itemTemplates;
-		this.roomTemplates = roomTemplates;
-	}
 
 	public ArrayList GetFloorsIn(Bounds bounds){
 		ArrayList query = new ArrayList ();
@@ -90,22 +73,6 @@ public class GameMap
 			}
 		}
 		return query;
-	}
-
-	public void GenerateMap(int width, int height, int rooms, int roomSize, int corridorsPerRoom, int corridorLenght){
-		bounds = new Bounds ();
-		bounds.SetMinMax (new Vector2 (0, 0), new Vector2 (width, height));
-	
-		MapGenerator generator = new MapGenerator (this, bounds.center);
-		for (int room = rooms; room > 0; room--) {
-			for (int corridor = corridorsPerRoom; corridor > 0; corridor--) {
-				generator.BuildCorridor (corridorLenght);
-			}
-			generator.BuildRoom(roomSize, roomSize);
-		}
-		generator.BuildWalls ();
-		generator.SpawnEnemies (0.10f);
-		generator.SpawnItems (0.02f);
 	}
 
 	public void SpawnFloors(Bounds bounds, GameObject template){
