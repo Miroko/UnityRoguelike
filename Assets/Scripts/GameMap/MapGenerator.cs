@@ -6,75 +6,8 @@ using System.Collections.Generic;
 
 public class MapGenerator
 {
-	private class HeightMap{
-		// True = Down
-		// False = Up
-		private bool[,] positions;
-		public int width, height;
-		public Vector2 center;
-		public Vector2 cursor;
-			
-		public HeightMap(int width, int height){
-			this.width = width;
-			this.height = height;
-			center = new Vector2(width / 2, height / 2);
-			cursor = center;
-			positions = new bool[width,height];
-		}
-
-		public bool Contains(float x, float y){
-			return (x >= 0 && x < width
-			        && y >= 0 && y < height);
-		}
-
-		public bool Contains(Vector2 position){
-			return Contains (position.x, position.y);
-		}
-
-		public bool IsLow(float x, float y){
-			return positions [(int)x, (int)y];	
-		}	
-
-		
-		public bool IsLow(Vector2 position){
-			return IsLow ((int)position.x, (int)position.y);
-		}
-
-		public void Lower(float x, float y){
-			positions [(int)x, (int)y] = true;
-		}
-
-		public void Lower(Vector2 position){
-			Lower (position.x, position.y);
-		}
-	
-		public bool ScanForLine(bool blocksWhenLow, Vector2 from, Vector2 direction, int lenght){
-			foreach(Vector2 position in LineIterator(from, direction, lenght + 1)){	
-				if(Contains(position)){
-					if (IsLow(position) == blocksWhenLow) {
-						return false;
-					}
-				}
-				else{	
-					return false;
-				}
-			}
-			return true;
-		}
-
-		public IEnumerable<Vector2> LineIterator(Vector2 from, Vector2 direction, int lenght){
-			Vector2 current = from;
-			Vector2 to = current + new Vector2(direction.x * lenght, direction.y * lenght);
-
-			int forceBreak = 0;
-			while(current != to || forceBreak > 10){
-				current = Vector2.MoveTowards (current, to, 1);
-				forceBreak++;
-				yield return current;
-			}
-		}
-
-	}
+	private Vector2 cursor;
+	private Vector2 cursorDirection;
 
 	public GameObject playerTemplate;
 	public GameObject[] enemyTemplates;
@@ -95,11 +28,14 @@ public class MapGenerator
 	public GameMap NewGameMap(int width, int height, int seed, int rooms, int corridors, int roomSize, int corridorLenght,
 	                          float enemyChance, float itemChance){
 
-		HeightMap heightMap = new HeightMap (width, height);
-		GameMap map = new GameMap();
-		SpawnPlayer (map, heightMap, heightMap.cursor);
-
+		GameMap map = new GameMap(width, height);
+		Vector2 center = new Vector2 (width/2, height/2);
 		UnityEngine.Random.seed = seed;
+
+		cursor = center;
+
+		SpawnPlayer (map, cursor);
+
 		int roomsToPlace = rooms; 
 		int corridorsToPlace = corridors; 
 		float total = roomsToPlace + corridorsToPlace;
@@ -115,23 +51,26 @@ public class MapGenerator
 			// Corridor
 			if(random < corridorPlaceChance){
 				//Debug.Log("corridor");
-				if(!BuildCorridor (map, heightMap, Direction.Random, corridorLenght)){
+				if(!BuildCorridor (map, Direction.RandomWeighted(cursorDirection, -0.8f), corridorLenght)){
 					foreach(Vector2 direction in Direction.Directions){
-						if (BuildCorridor (map, heightMap, direction, corridorLenght)){
+						if (BuildCorridor (map, direction, corridorLenght)){
 							corridorsToPlace--;
 							break;
 						}
 					}
 				}
 				else if(roomsToPlace != 0){
-					corridorsToPlace--;
+					BuildRoom(map, cursor, roomSize);
+					roomsToPlace--;
 				}
-				else break;
+				else {
+					break;
+				}
 			}
 			// Room
 			if(random < roomPlaceChance){
 				//Debug.Log(loop + "room");
-				BuildRoom(map, heightMap, heightMap.cursor, roomSize);
+				BuildRoom(map, cursor, roomSize);
 				roomsToPlace--;
 			}
 			else{
@@ -139,62 +78,62 @@ public class MapGenerator
 			}
 			total = roomsToPlace + corridorsToPlace;
 		}
-		BuildWalls (map, heightMap);
-		SpawnEnemies (map, heightMap, enemyChance);
-		SpawnItems (map, heightMap, itemChance);
+		BuildWalls (map);
+		SpawnEnemies (map, enemyChance);
+		SpawnItems (map, itemChance);
 		return map;
 	}
 
-	private void SpawnPlayer(GameMap map, HeightMap heightMap, Vector2 position){
+	private void SpawnPlayer(GameMap map, Vector2 position){
 		GameManager.playerHandler.playerEntity = (Character)map.SpawnEntity (position, playerTemplate);
-		heightMap.Lower(position);
 		map.SpawnFloor(position, floorTemplates[0]);
-		heightMap.cursor = position;
+		cursor = position;
 	}
 
-	private bool BuildCorridor(GameMap map, HeightMap heightMap, Vector2 direction, int corridorLenght){
-		if (heightMap.ScanForLine (true, heightMap.cursor, direction, corridorLenght)) {		
-			foreach (Vector2 position in heightMap.LineIterator(heightMap.cursor, direction, corridorLenght)) {
-				heightMap.Lower (position);
+	private bool BuildCorridor(GameMap map, Vector2 direction, int corridorLenght){
+		if (map.heightMap.ScanForLine (true, cursor, direction, corridorLenght)) {		
+			foreach (Vector2 position in map.heightMap.LineIterator(cursor, direction, corridorLenght)) {
+				map.heightMap.SetLow (position);
 				map.SpawnFloor (position, floorTemplates [0]);
-				heightMap.cursor = position;
+				cursor = position;
+				cursorDirection = direction;
 			}
 			return true;
 		} else
 			return false;
 	}
 
-	private void BuildRoom(GameMap map, HeightMap heightMap, Vector2 position, int size){
+	private void BuildRoom(GameMap map, Vector2 position, int size){
 		for (float x = position.x; x < position.x + size; x++) {
 			for (float y = position.y; y < position.y + size; y++) {
 				Vector2 floorPosition = new Vector2(x,y);
-				if(heightMap.Contains(floorPosition)){
-					heightMap.Lower(floorPosition);
+				if(map.heightMap.Contains(floorPosition)){
+					map.heightMap.SetLow(floorPosition);
 					map.SpawnFloor(floorPosition, floorTemplates[0]);
-					heightMap.cursor = position;
+					cursor = position;
 				}
 			}
 		}
 
-		// Cursor to random corner
+		// Door pos
 		float value = UnityEngine.Random.value;
 		if (value < 0.25f) {
-			heightMap.cursor.Set(position.x, position.y);
+			cursor.Set(position.x + (int)(size/2), position.y);
 		} else if (value < 0.50f) {
-			heightMap.cursor.Set(position.x + size - 1, position.y);
+			cursor.Set(position.x + (int)(size/2),  position.y + (int)(size/2));
 		} else if (value < 0.750f) {
-			heightMap.cursor.Set(position.x, position.y + size - 1);
+			cursor.Set(position.x + size - 1, position.y + (int)(size/2));
 		} else {
-			heightMap.cursor.Set(position.x + size - 1, position.y + size - 1);
+			cursor.Set(position.x + (int)(size/2), position.y + size - 1);
 		}
 	}
 
-	private void BuildWalls(GameMap map, HeightMap heightMap){
-		for (float x = -5; x < heightMap.width + 5; x++) {
-			for (float y = -5; y < heightMap.height + 5; y++) {
+	private void BuildWalls(GameMap map){
+		for (float x = -5; x < map.heightMap.width + 5; x++) {
+			for (float y = -5; y < map.heightMap.height + 5; y++) {
 				Vector2 position = new Vector2(x,y);
-				if(heightMap.Contains(position)){
-					if(heightMap.IsLow(position) == false){
+				if(map.heightMap.Contains(position)){
+					if(map.heightMap.IsLow(position) == false){
 						map.SpawnWall(position, wallTemplates[0]);
 					}
 				}
@@ -205,11 +144,11 @@ public class MapGenerator
 		}
 	}
 
-	private void SpawnEnemies(GameMap map, HeightMap heightMap, float chance){
-		for (float x = 0; x < heightMap.width; x++) {
-			for (float y = 0; y < heightMap.height; y++) {
+	private void SpawnEnemies(GameMap map, float chance){
+		for (float x = 0; x < map.heightMap.width; x++) {
+			for (float y = 0; y < map.heightMap.height; y++) {
 				Vector2 position = new Vector2(x,y);
-				if(heightMap.IsLow(position)){
+				if(map.heightMap.IsLow(position)){
 					if(RandomHelper.Chance(chance)){
 						map.SpawnEntity(position, enemyTemplates[0]);
 					}
@@ -218,11 +157,11 @@ public class MapGenerator
 		}
 	}
 
-	private void SpawnItems(GameMap map, HeightMap heightMap, float chance){
-		for (float x = 0; x < heightMap.width; x++) {
-			for (float y = 0; y < heightMap.height; y++) {
+	private void SpawnItems(GameMap map, float chance){
+		for (float x = 0; x < map.heightMap.width; x++) {
+			for (float y = 0; y < map.heightMap.height; y++) {
 				Vector2 position = new Vector2(x,y);
-				if(heightMap.IsLow(position)){
+				if(map.heightMap.IsLow(position)){
 					if(RandomHelper.Chance(chance)){
 						map.SpawnItem(position, itemTemplates[0]);
 					}

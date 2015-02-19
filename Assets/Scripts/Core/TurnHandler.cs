@@ -26,7 +26,7 @@ public class TurnHandler
 	private void TakePlayerTurn(){
 		Vector2 moveDirection = GameManager.inputHandler.GetMoveDirection ();
 		if (moveDirection != Vector2.zero) {
-			GameManager.gameMap.MoveEntity (GameManager.playerHandler.playerEntity, moveDirection);
+			GameManager.playerHandler.playerEntity.MoveIfNotBlocked(GameManager.gameMap, moveDirection);
 			lastEntityMoving = GameManager.playerHandler.playerEntity;
 			// Player moved, end player turn
 			playerTurn = false;
@@ -36,7 +36,7 @@ public class TurnHandler
 	private void TakeEnemyTurn(){
 		foreach(Character entity in GameManager.gameMap.entityInstances){
 			if(entity != GameManager.playerHandler.playerEntity){
-				GameManager.ai.WanderRandomly(entity);
+				GameManager.ai.Wander(entity, 0.8f);
 				if(entity.isMoving){
 					lastEntityMoving = entity;
 				}

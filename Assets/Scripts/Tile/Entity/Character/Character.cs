@@ -9,6 +9,9 @@ public abstract class Character : Entity
 	public float movePerSecond;
 	public Animator animator;
 
+
+	public Vector3 currentDirection;
+
 	private Vector3 moveDestination;
 	public Vector3 getMoveDestination(){
 		return moveDestination;
@@ -20,6 +23,7 @@ public abstract class Character : Entity
 
 	public void Start(){
 		moveDestination = transform.position;
+		currentDirection = Direction.Up;
 	}
 
 	public void takeDamage(int amount){
@@ -36,13 +40,33 @@ public abstract class Character : Entity
 		entity.takeDamage (damage);
 	}
 
-	public void SetMoveDestination(Vector3 destination){
-		moveDestination = destination;
-		isMoving = true;
+	public bool MoveIfNotBlocked(GameMap map, Vector3 direction){
+		currentDirection = direction;
+		Vector3 currentPosition = gameObject.transform.position;
+		Vector3 destination = currentPosition + currentDirection;
+		if (map.heightMap.Contains (destination)) {
+			if (map.heightMap.IsLow (destination)) {
+				foreach (Character entity in map.GetEntitiesAt(destination)) {
+					if (entity != this) {
+						if (entity.Blocks (this)) {	
+							HandleCollision (entity);
+							return false;
+						}
+					}
+				}
+				SetMoveDestination (destination);
+				foreach (Item item in map.GetItemsAt(destination)) {
+					HandleCollision (item);
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public void Update(){
-		MoveTowardsDestination();
+	private void SetMoveDestination(Vector3 destination){
+		moveDestination = destination;
+		isMoving = true;
 	}
 
 	private void MoveTowardsDestination(){
@@ -53,7 +77,12 @@ public abstract class Character : Entity
 				isMoving = false;
 			}
 		}
-
+		
 	}
+
+	public void Update(){
+		MoveTowardsDestination();
+	}	
+
 }
 
