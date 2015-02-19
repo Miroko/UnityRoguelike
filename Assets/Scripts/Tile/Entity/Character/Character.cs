@@ -23,7 +23,7 @@ public abstract class Character : Entity
 
 	public void Start(){
 		moveDestination = transform.position;
-		currentDirection = Direction.Up;
+		currentDirection = Direction.Random;
 	}
 
 	public void takeDamage(int amount){
