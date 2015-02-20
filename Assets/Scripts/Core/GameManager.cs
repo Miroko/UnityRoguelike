@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
 	public int mapHeight;
 
 	public int seed;
+	public int level;
 
 	public int rooms;
 	public int roomSize;
@@ -39,10 +40,11 @@ public class GameManager : MonoBehaviour {
 
 		playerHandler = new PlayerHandler ();	
 
-		mapGenerator = new MapGenerator (playerTemplate, floorTemplates, wallTemplates,
+		mapGenerator = new MapGenerator (mapWidth, mapHeight, seed, rooms, corridors,
+		                                 roomSize, corridorLength, enemyChance, itemChance, level, playerTemplate, floorTemplates, wallTemplates,
 		                                 enemyTemplates, itemTemplates);
-		gameMap = mapGenerator.NewGameMap (mapWidth, mapHeight, seed, rooms, corridors,
-		                                   roomSize, corridorLength, enemyChance, itemChance);
+
+		NextLevel ();
 
 		turnHandler = new TurnHandler ();
 		turnHandler.playerTurn = true;
@@ -50,6 +52,10 @@ public class GameManager : MonoBehaviour {
 		inputHandler = new InputHandler ();
 
 		ai = new Ai ();
+	}
+
+	public static void NextLevel(){
+		gameMap = mapGenerator.NewGameMap (mapGenerator.currentLevel++);
 	}
 
 	void Update () {
