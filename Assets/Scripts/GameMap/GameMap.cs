@@ -23,6 +23,16 @@ public class GameMap
 		}
 		return query;
 	}
+
+	public ArrayList GetFunctionalsAt(Vector3 point){
+		ArrayList query = new ArrayList();
+		foreach (Functional functional in functionalInstances) {
+			if (functional.transform.position == point){
+				query.Add(functional);
+			}
+		}
+		return query;
+	}
 	
 	public ArrayList GetCharactersAt(Vector3 point){
 		ArrayList query = new ArrayList();

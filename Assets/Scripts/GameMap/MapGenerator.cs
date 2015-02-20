@@ -83,7 +83,7 @@ public class MapGenerator
 	}
 
 	private void SpawnPlayer(GameMap map, Vector2 position){
-		GameManager.playerHandler.playerCharacter = (Character)map.SpawnCharacter (position, playerTemplate);
+		GameManager.playerHandler.SetPlayerCharacter((Character)map.SpawnCharacter (position, playerTemplate));
 		map.SpawnFloor(position, floorTemplates[0]);
 	}
 

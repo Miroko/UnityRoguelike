@@ -5,11 +5,7 @@ public class TurnHandler
 {
 	public bool playerTurn = true;
 
-	private Character lastCharacterMoving;
-
-	public TurnHandler(){
-		lastCharacterMoving = GameManager.playerHandler.playerCharacter;
-	}
+	public Character lastCharacterMoving;
 
 	public void PlayTurn(){
 		if (lastCharacterMoving.isMoving == false) {

@@ -54,10 +54,13 @@ public abstract class Character : Tile
 						}
 					}
 				}
-				SetMoveDestination (destination);
+				foreach (Functional functional in map.GetFunctionalsAt(destination)) {
+					HandleCollision (functional);									
+				}
 				foreach (Item item in map.GetItemsAt(destination)) {
 					HandleCollision (item);
 				}
+				SetMoveDestination (destination);
 				return true;
 			}
 		}

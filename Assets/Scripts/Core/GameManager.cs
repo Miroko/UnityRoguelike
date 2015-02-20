@@ -35,28 +35,30 @@ public class GameManager : MonoBehaviour {
 	public static InputHandler inputHandler;
 	public static Ai ai;
 
-	void Awake () {
-		instantiator = new Instantiator ();
 
-		playerHandler = new PlayerHandler ();	
-
+	void Awake(){
+		instantiator = new Instantiator ();		
+		playerHandler = new PlayerHandler ();		
 		mapGenerator = new MapGenerator (mapWidth, mapHeight, seed, rooms, corridors,
 		                                 roomSize, corridorLength, enemyChance, itemChance, level,
 		                                 playerTemplate, exitTemplate, floorTemplates, wallTemplates,
-		                                 enemyTemplates, itemTemplates);
+		                                 enemyTemplates, itemTemplates);		
+		turnHandler = new TurnHandler ();		
+		inputHandler = new InputHandler ();		
+		ai = new Ai ();
+
+		DontDestroyOnLoad (this);
 
 		NextLevel ();
+	}
 
-		turnHandler = new TurnHandler ();
+	void OnLevelWasLoaded(int level){
+		gameMap = mapGenerator.NewGameMap (mapGenerator.currentLevel++);
 		turnHandler.playerTurn = true;
-
-		inputHandler = new InputHandler ();
-
-		ai = new Ai ();
 	}
 
 	public static void NextLevel(){
-		gameMap = mapGenerator.NewGameMap (mapGenerator.currentLevel++);
+		Application.LoadLevel ("Game");
 	}
 
 	void Update () {
