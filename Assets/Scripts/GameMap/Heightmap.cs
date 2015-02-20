@@ -61,31 +61,60 @@ public class Heightmap
 		}
 		return inBounds;
 	}
-	
-	public bool ScanForLine(bool blocksWhenLow, Vector2 from, Vector2 direction, int lenght){
-		foreach(Vector2 position in LineIterator(from, direction, lenght + 1)){	
-			if(Contains(position)){
-				if (IsLow(position) == blocksWhenLow) {
+
+	public bool ScanForOpenLine(bool highBreaks, Vector3 from, Vector3 direction, int lenght){
+		Vector3 destination = new Vector2 (from.x + (direction.x * lenght), from.y + (direction.y * lenght));
+		foreach (Vector2 positionOnLine in LineIterator(from, direction, lenght)) {
+			if(Contains(positionOnLine)){
+				if(!IsLow(positionOnLine) == highBreaks){
 					return false;
 				}
 			}
-			else{	
+			else{
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	public IEnumerable<Vector2> LineIterator(Vector2 from, Vector2 direction, int lenght){
-			Vector2 current = from;
-			Vector2 to = current + new Vector2(direction.x * lenght, direction.y * lenght);
-			
-			int forceBreak = 0;
-			while(current != to || forceBreak > 10){
-				current = Vector2.MoveTowards (current, to, 1);
-				forceBreak++;
-				yield return current;
+
+	public bool ScanForOpenLine(bool highBreaks, Vector3 from, Vector3 destination){
+		foreach (Vector2 positionOnLine in LineIterator(from, destination)) {
+			if(Contains(positionOnLine)){
+				if(!IsLow(positionOnLine) == highBreaks){				
+					return false;
+				}
 			}
+			else{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private const int maxScanDistance = 10;
+	public IEnumerable<Vector3> LineIterator(Vector3 from, Vector3 direction, int lenght){
+		Vector3 current = from;
+		Vector3 destination = new Vector2 (from.x + (direction.x * lenght), from.y + (direction.y * lenght));
+		if (Contains (current) && Contains (destination)) {
+			if (Vector3.Distance (from, destination) < maxScanDistance) {
+				while (current != destination) {
+					current = Vector3.MoveTowards (current, destination, 1);				
+					yield return current;	
+				}
+			}
+		}
+	}
+
+	public IEnumerable<Vector3> LineIterator(Vector3 from, Vector3 destination){
+		Vector3 current = from;
+		if (Contains (current) && Contains (destination)) {
+			if (Vector3.Distance (from, destination) < maxScanDistance) {
+				while (current != destination) {
+					current = Vector3.MoveTowards (current, destination, 1);				
+					yield return current;	
+				}
+			}
+		}
 	}
 }
 

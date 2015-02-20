@@ -91,7 +91,7 @@ public class MapGenerator
 	}
 
 	private bool BuildCorridor(GameMap map, Vector2 direction, int corridorLenght){
-		if (map.heightMap.ScanForLine (true, cursor, direction, corridorLenght)) {		
+		if (map.heightMap.ScanForOpenLine (false, cursor, direction, corridorLenght)) {		
 			foreach (Vector2 position in map.heightMap.LineIterator(cursor, direction, corridorLenght)) {
 				map.heightMap.SetLow (position);
 				map.SpawnFloor (position, floorTemplates [0]);

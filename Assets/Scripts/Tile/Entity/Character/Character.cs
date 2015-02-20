@@ -40,7 +40,7 @@ public abstract class Character : Entity
 		entity.takeDamage (damage);
 	}
 
-	public bool MoveIfNotBlocked(GameMap map, Vector3 direction){
+	public bool Move(GameMap map, Vector3 direction){
 		currentDirection = direction;
 		Vector3 currentPosition = gameObject.transform.position;
 		Vector3 destination = currentPosition + currentDirection;
