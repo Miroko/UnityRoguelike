@@ -14,6 +14,7 @@ public class MapGenerator
 	private float enemyChance, itemChance;
 
 	public GameObject playerTemplate;
+	public GameObject exitTemplate;
 	public GameObject[] enemyTemplates;
 	public GameObject[] itemTemplates;
 	public GameObject[] floorTemplates;
@@ -21,7 +22,8 @@ public class MapGenerator
 	public GameObject[] roomTemplates;
 
 	public MapGenerator(int width, int height, int seed, int rooms, int corridors, int roomSize, int corridorLenght,
-	                    float enemyChance, float itemChance, int currentLevel ,GameObject playerTemplate, GameObject[] floorTemplates, GameObject[] wallTemplates,
+	                    float enemyChance, float itemChance, int currentLevel,
+	                    GameObject playerTemplate, GameObject exitTemplate, GameObject[] floorTemplates, GameObject[] wallTemplates,
 	                    GameObject[] enemyTemplates, GameObject[] itemTemplates){
 		this.width = width;
 		this.height = height;
@@ -35,6 +37,7 @@ public class MapGenerator
 		this.currentLevel = currentLevel;
 
 		this.playerTemplate = playerTemplate;
+		this.exitTemplate = exitTemplate;
 		this.enemyTemplates = enemyTemplates;
 		this.floorTemplates = floorTemplates;
 		this.wallTemplates = wallTemplates;
@@ -42,7 +45,6 @@ public class MapGenerator
 	}
 
 	public GameMap NewGameMap(int level){
-
 		GameMap map = new GameMap(width, height);
 		Vector2 center = new Vector2 (width/2, height/2);
 		UnityEngine.Random.seed = (seed * level);
@@ -69,16 +71,20 @@ public class MapGenerator
 			}
 			left = roomsToPlace + corridorsToPlace;
 		}
+		SpawnExit (map, cursorPosition);
 		BuildWalls (map);
 		SpawnEnemies (map, enemyChance);
 		SpawnItems (map, itemChance);
 		return map;
 	}
 
+	private void SpawnExit(GameMap map, Vector2 position){
+		map.SpawnExit (position, exitTemplate);
+	}
+
 	private void SpawnPlayer(GameMap map, Vector2 position){
-		GameManager.playerHandler.playerEntity = (Character)map.SpawnEntity (position, playerTemplate);
+		GameManager.playerHandler.playerCharacter = (Character)map.SpawnCharacter (position, playerTemplate);
 		map.SpawnFloor(position, floorTemplates[0]);
-		cursorPosition = position;
 	}
 
 	private void BuildCorridor(GameMap map, Vector2 direction, int corridorLenght){
@@ -127,7 +133,7 @@ public class MapGenerator
 				Vector2 position = new Vector2(x,y);
 				if(map.heightMap.IsLow(position)){
 					if(RandomHelper.Chance(chance)){
-						map.SpawnEntity(position, enemyTemplates[0]);
+						map.SpawnCharacter(position, enemyTemplates[0]);
 					}
 				}			
 			}

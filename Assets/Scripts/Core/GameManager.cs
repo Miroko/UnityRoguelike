@@ -5,8 +5,6 @@ public class GameManager : MonoBehaviour {
 
 	public Camera cameraMain;
 
-	public GameObject playerTemplate;
-
 	public int mapWidth;
 	public int mapHeight;
 
@@ -22,6 +20,8 @@ public class GameManager : MonoBehaviour {
 	public float enemyChance;
 	public float itemChance;
 
+	public GameObject playerTemplate;
+	public GameObject exitTemplate;
 	public GameObject[] floorTemplates;
 	public GameObject[] wallTemplates;
 	public GameObject[] enemyTemplates;
@@ -41,7 +41,8 @@ public class GameManager : MonoBehaviour {
 		playerHandler = new PlayerHandler ();	
 
 		mapGenerator = new MapGenerator (mapWidth, mapHeight, seed, rooms, corridors,
-		                                 roomSize, corridorLength, enemyChance, itemChance, level, playerTemplate, floorTemplates, wallTemplates,
+		                                 roomSize, corridorLength, enemyChance, itemChance, level,
+		                                 playerTemplate, exitTemplate, floorTemplates, wallTemplates,
 		                                 enemyTemplates, itemTemplates);
 
 		NextLevel ();
@@ -62,7 +63,7 @@ public class GameManager : MonoBehaviour {
 		turnHandler.PlayTurn ();
 
 		// TODO: Fix lag
-		Vector3 cameraPos = new Vector3(playerHandler.playerEntity.transform.position.x, playerHandler.playerEntity.transform.position.y, cameraMain.transform.position.z);
+		Vector3 cameraPos = new Vector3(playerHandler.playerCharacter.transform.position.x, playerHandler.playerCharacter.transform.position.y, cameraMain.transform.position.z);
 		cameraMain.transform.position = cameraPos;
 	}
 

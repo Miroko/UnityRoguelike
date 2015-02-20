@@ -12,5 +12,6 @@ public class Potion : Item
 		Destroy (gameObject);
 	}
 
+
 }
 

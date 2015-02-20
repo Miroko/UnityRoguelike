@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public abstract class Character : Entity
+public abstract class Character : Tile
 {
 	public int health;
 	public int damage;
@@ -30,7 +30,7 @@ public abstract class Character : Entity
 		animator.SetTrigger ("onTakeDamage");
 		health -= amount;
 		if (health <= 0) {
-			GameManager.gameMap.entityInstances.Remove(this);
+			GameManager.gameMap.characterInstances.Remove(this);
 			Destroy(gameObject);
 		}
 	}
@@ -46,7 +46,7 @@ public abstract class Character : Entity
 		Vector3 destination = currentPosition + currentDirection;
 		if (map.heightMap.Contains (destination)) {
 			if (map.heightMap.IsLow (destination)) {
-				foreach (Character entity in map.GetEntitiesAt(destination)) {
+				foreach (Character entity in map.GetCharactersAt(destination)) {
 					if (entity != this) {
 						if (entity.Blocks (this)) {	
 							HandleCollision (entity);

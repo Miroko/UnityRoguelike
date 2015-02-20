@@ -4,10 +4,9 @@ using System.Collections.Generic;
 
 public class GameMap
 {
-	public List<Entity> entityInstances = new List<Entity>();
-	//public List<Floor> floorInstances = new List<Floor> ();
-	//public List<Wall> wallInstances = new List<Wall> ();
+	public List<Character> characterInstances = new List<Character>();
 	public List<Item> itemInstances = new List<Item> ();
+	public List<Functional> functionalInstances = new List<Functional> ();
 
 	public Heightmap heightMap;
 
@@ -25,9 +24,9 @@ public class GameMap
 		return query;
 	}
 	
-	public ArrayList GetEntitiesAt(Vector3 point){
+	public ArrayList GetCharactersAt(Vector3 point){
 		ArrayList query = new ArrayList();
-		foreach (Character entity in entityInstances) {
+		foreach (Character entity in characterInstances) {
 			if(entity.isMoving){
 				if(entity.getMoveDestination() == point){
 					query.Add(entity);
@@ -79,12 +78,17 @@ public class GameMap
 		return item;
 	}
 
-	public Entity SpawnEntity(Vector2 position, GameObject template){
-		Entity entity = GameManager.instantiator.Instantiate(position, template).gameObject.GetComponent<Entity>();
-		entityInstances.Add (entity);
-		return entity;
+	public Character SpawnCharacter(Vector2 position, GameObject template){
+		Character character = GameManager.instantiator.Instantiate(position, template).gameObject.GetComponent<Character>();
+		characterInstances.Add (character);
+		return character;
 	}
 
+	public Exit SpawnExit(Vector2 position, GameObject template){
+		Exit exit = GameManager.instantiator.Instantiate(position, template).gameObject.GetComponent<Exit>();
+		functionalInstances.Add (exit);
+		return exit;
+	}
 
 }
 

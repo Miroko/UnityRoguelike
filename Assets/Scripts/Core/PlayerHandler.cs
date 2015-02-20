@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlayerHandler
 {
-	public Character playerEntity;
+	public Character playerCharacter;
 
 }
 
