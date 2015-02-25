@@ -19,11 +19,9 @@ public class Ai
 			foreach(Vector3 position in GameManager.gameMap.heightMap.LineIterator(moving.transform.position, direction, viewDistance)){																								
 				//Debug.DrawLine(position, new Vector2(position.x, position.y + 0.2f), Color.green, float.MaxValue);
 				if(towards.transform.position == position){
-					if(GameManager.gameMap.heightMap.ScanForOpenLine(true, moving.transform.position, towards.transform.position)){
-						moving.Move(GameManager.gameMap, direction);
-						//Debug.DrawLine(position, new Vector2(position.x, position.y + 0.2f), Color.red, float.MaxValue);
-						return true;
-					}
+					moving.Move(GameManager.gameMap, direction);
+					//Debug.DrawLine(position, new Vector2(position.x, position.y + 0.2f), Color.red, float.MaxValue);
+					return true;
 				}
 			}	
 		}
