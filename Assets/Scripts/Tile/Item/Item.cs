@@ -3,8 +3,7 @@ using System.Collections;
 
 public abstract class Item : Tile
 {
-
-	public abstract void OnPickup (Character picker);
+	public abstract void OnPickup (Player picker);
 
 	public override bool Blocks (Tile tile)
 	{

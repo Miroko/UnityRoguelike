@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour {
 
 	public float enemyChance;
 	public float itemChance;
+	
+	public Player player;
 
 	public GameObject playerTemplate;
 	public GameObject exitTemplate;
@@ -35,18 +37,22 @@ public class GameManager : MonoBehaviour {
 	public static Ai ai;
 
 	void Awake(){
+		DontDestroyOnLoad (gameObject);
+
 		instantiator = new Instantiator ();		
 		playerHandler = new PlayerHandler ();		
 		mapGenerator = new MapGenerator (mapWidth, mapHeight, seed, rooms, corridors,
 		                                 roomSize, corridorLength, enemyChance, itemChance, level,
-		                                 playerTemplate, exitTemplate, breakableWallTemplate, floorTemplates, wallTemplates,
+		                                 exitTemplate, breakableWallTemplate, floorTemplates, wallTemplates,
 		                                 enemyTemplates, itemTemplates);		
 		turnHandler = new TurnHandler ();		
 		inputHandler = new InputHandler ();		
 		ai = new Ai ();
 
-		DontDestroyOnLoad (gameObject);
+		GameManager.playerHandler.SetPlayerCharacter (player);
+	}
 
+	void Start(){
 		NextLevel ();
 	}
 

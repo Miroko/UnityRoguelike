@@ -13,7 +13,6 @@ public class MapGenerator
 	private int width, height, seed, rooms, corridors, roomSize, corridorLenght;
 	private float enemyChance, itemChance;
 
-	public GameObject playerTemplate;
 	public GameObject exitTemplate;
 	public GameObject breakableWallTemplate;
 	public GameObject[] enemyTemplates;
@@ -24,7 +23,7 @@ public class MapGenerator
 
 	public MapGenerator(int width, int height, int seed, int rooms, int corridors, int roomSize, int corridorLenght,
 	                    float enemyChance, float itemChance, int currentLevel,
-	                    GameObject playerTemplate, GameObject exitTemplate, GameObject breakableWallTemplate,
+	                    GameObject exitTemplate, GameObject breakableWallTemplate,
 	                    GameObject[] floorTemplates, GameObject[] wallTemplates, GameObject[] enemyTemplates,
 	                    GameObject[] itemTemplates){
 		this.width = width;
@@ -38,7 +37,6 @@ public class MapGenerator
 		this.itemChance = itemChance;
 		this.currentLevel = currentLevel;
 
-		this.playerTemplate = playerTemplate;
 		this.exitTemplate = exitTemplate;
 		this.breakableWallTemplate = breakableWallTemplate;
 		this.enemyTemplates = enemyTemplates;
@@ -54,6 +52,7 @@ public class MapGenerator
 
 		cursorPosition = center;
 
+		map.SpawnFloor(cursorPosition, floorTemplates[0]);
 		SpawnPlayer (map, cursorPosition);
 
 		int roomsToPlace = rooms; 
@@ -99,8 +98,9 @@ public class MapGenerator
 	}
 
 	private void SpawnPlayer(GameMap map, Vector2 position){
-		GameManager.playerHandler.SetPlayerCharacter((Character)map.SpawnCharacter (position, playerTemplate));
-		map.SpawnFloor(position, floorTemplates[0]);
+		GameManager.playerHandler.playerCharacter.transform.position = position;
+		GameManager.playerHandler.playerCharacter.SetMoveDestination (position);
+		map.characterInstances.Add (GameManager.playerHandler.playerCharacter);
 	}
 
 	private void BuildCorridor(GameMap map, Vector2 direction, int corridorLenght){

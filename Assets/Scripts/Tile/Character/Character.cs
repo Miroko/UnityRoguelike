@@ -10,14 +10,14 @@ public abstract class Character : Tile
 	public Animator animator;
 
 
-	public Vector3 currentDirection;
+	[HideInInspector] public Vector3 currentDirection;
 
 	private Vector3 moveDestination;
 	public Vector3 getMoveDestination(){
 		return moveDestination;
 	}
 
-	public bool isMoving = false;
+	[HideInInspector] public bool isMoving = false;
 
 	public abstract void HandleCollision (Tile tile);
 
@@ -26,7 +26,7 @@ public abstract class Character : Tile
 		currentDirection = Direction.Random;
 	}
 
-	public void TakeDamage(int amount){
+	public virtual void TakeDamage(int amount){
 		animator.SetTrigger ("onTakeDamage");
 		health -= amount;
 		if (health <= 0) {
@@ -44,7 +44,7 @@ public abstract class Character : Tile
 		}
 	}
 
-	public bool Move(GameMap map, Vector3 direction){
+	public virtual bool Move(GameMap map, Vector3 direction){
 		currentDirection = direction;
 		Vector3 currentPosition = gameObject.transform.position;
 		Vector3 destination = currentPosition + currentDirection;
@@ -78,20 +78,18 @@ public abstract class Character : Tile
 		return false;
 	}
 
-	private void SetMoveDestination(Vector3 destination){
+	public void SetMoveDestination(Vector3 destination){
 		moveDestination = destination;
 		isMoving = true;
 	}
 
 	private void MoveTowardsDestination(){
-		if (moveDestination != transform.position) {
+		if (Vector3.Distance (transform.position, moveDestination) < 0.001f) {
+			transform.position = moveDestination;
+			isMoving = false;
+		} else {
 			transform.position = Vector3.MoveTowards(transform.position, moveDestination, Time.deltaTime * movePerSecond);
-			if(Vector3.Distance(transform.position, moveDestination) < 0.001f){
-				transform.position = moveDestination;
-				isMoving = false;
-			}
 		}
-		
 	}
 
 	public void Update(){

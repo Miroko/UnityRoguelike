@@ -3,9 +3,9 @@ using System.Collections;
 
 public class PlayerHandler
 {
-	public Character playerCharacter;
+	public Player playerCharacter;
 
-	public void SetPlayerCharacter(Character playerCharacter){
+	public void SetPlayerCharacter(Player playerCharacter){
 		this.playerCharacter = playerCharacter;
 		GameManager.turnHandler.lastCharacterMoving = playerCharacter;
 	}
