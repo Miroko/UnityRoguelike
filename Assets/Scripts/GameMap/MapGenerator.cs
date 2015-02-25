@@ -143,8 +143,8 @@ public class MapGenerator
 	private void BuildBreakableWalls(GameMap map){
 		for (float x = 0; x < map.heightMap.width; x++) {
 			for (float y = 0; y < map.heightMap.height; y++) {
-				Vector2 position = new Vector2(x,y);
-				if(map.heightMap.IsLow(position)){
+				Vector3 position = new Vector3(x,y);
+				if(map.heightMap.IsLow(position) && position != GameManager.playerHandler.playerCharacter.transform.position){
 					if(RandomHelper.Chance(0.6f)){
 						if(map.GetFunctionalsAt(position).Count == 0){
 							int surroundingWalls = 0;
