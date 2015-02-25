@@ -49,10 +49,6 @@ public abstract class Character : Tile
 		Vector3 currentPosition = gameObject.transform.position;
 		Vector3 destination = currentPosition + currentDirection;
 		if (map.heightMap.Contains (destination)) {
-			foreach (Functional functional in map.GetFunctionalsAt(destination)) {
-				HandleCollision (functional);	
-				if(functional.Blocks(this)) return false;
-			}
 			if (map.heightMap.IsLow (destination)) {
 				foreach (Character entity in map.GetCharactersAt(destination)) {
 					if (entity != this) {
@@ -65,8 +61,18 @@ public abstract class Character : Tile
 				foreach (Item item in map.GetItemsAt(destination)) {
 					HandleCollision (item);
 				}
+				foreach (Functional functional in map.GetFunctionalsAt(destination)) {
+					HandleCollision (functional);	
+					if(functional.Blocks(this)) return false;
+				}
 				SetMoveDestination (destination);
 				return true;
+			}		
+			else{
+				foreach (Functional functional in map.GetFunctionalsAt(destination)) {
+					HandleCollision (functional);	
+					if(functional.Blocks(this)) return false;
+				}
 			}
 		}
 		return false;
@@ -80,7 +86,7 @@ public abstract class Character : Tile
 	private void MoveTowardsDestination(){
 		if (moveDestination != transform.position) {
 			transform.position = Vector3.MoveTowards(transform.position, moveDestination, Time.deltaTime * movePerSecond);
-			if(Vector3.Distance(transform.position, moveDestination) < 0.01f){
+			if(Vector3.Distance(transform.position, moveDestination) < 0.001f){
 				transform.position = moveDestination;
 				isMoving = false;
 			}

@@ -30,12 +30,15 @@ public class TurnHandler
 
 	private void TakeEnemyTurn(){
 		foreach(Character character in GameManager.gameMap.characterInstances){
-			if(character != GameManager.playerHandler.playerCharacter){
-				if(!GameManager.ai.MoveTowardsEntityIfInView(character, GameManager.playerHandler.playerCharacter, 3)){
-					GameManager.ai.Wander(character, 1f);
-				}
-				if(character.isMoving){
-					lastCharacterMoving = character;
+			// Skip chance
+			if(!RandomHelper.Chance(0.2f)){
+				if(character != GameManager.playerHandler.playerCharacter){
+					if(!GameManager.ai.MoveTowardsEntityIfInView(character, GameManager.playerHandler.playerCharacter, 3)){
+						GameManager.ai.Wander(character, 1f);
+					}
+					if(character.isMoving){
+						lastCharacterMoving = character;
+					}
 				}
 			}
 		}

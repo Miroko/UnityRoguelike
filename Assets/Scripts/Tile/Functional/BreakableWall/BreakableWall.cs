@@ -15,5 +15,10 @@ public class BreakableWall : Functional
 		}
 	}
 
+	public override bool Blocks (Tile tile)
+	{
+		return true;
+	}
+
 }
 
