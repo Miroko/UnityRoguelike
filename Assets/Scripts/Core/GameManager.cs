@@ -3,8 +3,6 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-	public Camera cameraMain;
-
 	public int mapWidth;
 	public int mapHeight;
 
@@ -35,7 +33,6 @@ public class GameManager : MonoBehaviour {
 	public static InputHandler inputHandler;
 	public static Ai ai;
 
-
 	void Awake(){
 		instantiator = new Instantiator ();		
 		playerHandler = new PlayerHandler ();		
@@ -63,10 +60,6 @@ public class GameManager : MonoBehaviour {
 
 	void Update () {
 		turnHandler.PlayTurn ();
-
-		// TODO: Fix lag
-		Vector3 cameraPos = new Vector3(playerHandler.playerCharacter.transform.position.x, playerHandler.playerCharacter.transform.position.y, cameraMain.transform.position.z);
-		cameraMain.transform.position = cameraPos;
 	}
 
 }
