@@ -14,7 +14,7 @@ public class Enemy : Character
 	public override void HandleCollision (Tile tile)
 	{
 		if (tile is Player) {
-			attack((Character)tile);
+			Attack((Character)tile);
 		}
 
 	}

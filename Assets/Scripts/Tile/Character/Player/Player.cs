@@ -14,7 +14,9 @@ public class Player : Character
 	public override void HandleCollision (Tile tile)
 	{
 		if (tile is Enemy)
-			attack ((Character)tile);
+			Attack (tile);
+		else if (tile is BreakableWall)
+			Attack (tile);
 		else if (tile is Item)
 			((Item)tile).OnPickup (this);
 		else if (tile is Exit) {

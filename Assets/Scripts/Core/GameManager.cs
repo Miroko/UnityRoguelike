@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject playerTemplate;
 	public GameObject exitTemplate;
+	public GameObject breakableWallTemplate;
 	public GameObject[] floorTemplates;
 	public GameObject[] wallTemplates;
 	public GameObject[] enemyTemplates;
@@ -38,13 +39,13 @@ public class GameManager : MonoBehaviour {
 		playerHandler = new PlayerHandler ();		
 		mapGenerator = new MapGenerator (mapWidth, mapHeight, seed, rooms, corridors,
 		                                 roomSize, corridorLength, enemyChance, itemChance, level,
-		                                 playerTemplate, exitTemplate, floorTemplates, wallTemplates,
+		                                 playerTemplate, exitTemplate, breakableWallTemplate, floorTemplates, wallTemplates,
 		                                 enemyTemplates, itemTemplates);		
 		turnHandler = new TurnHandler ();		
 		inputHandler = new InputHandler ();		
 		ai = new Ai ();
 
-		DontDestroyOnLoad (this);
+		DontDestroyOnLoad (gameObject);
 
 		NextLevel ();
 	}

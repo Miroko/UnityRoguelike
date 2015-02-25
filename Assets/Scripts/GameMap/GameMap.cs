@@ -49,23 +49,11 @@ public class GameMap
 		return query;
 	}
 
-	public void SpawnFloors(Bounds bounds, GameObject template){
-		for (float x = bounds.min.x; x < bounds.max.x; x++) {
-			for (float y = bounds.min.y; y < bounds.max.y; y++) {
-				SpawnFloor(new Vector2(x,y), template);
-			}
-		}	
-	}
-	
-	public void SpawnWalls(Bounds bounds, GameObject template){
-		for (float x = bounds.min.x; x <= bounds.max.x; x++) {
-			for (float y = bounds.min.y; y <= bounds.max.y; y++) {
-				Wall wall = GameManager.instantiator.Instantiate(new Vector2(x, y), template).gameObject.GetComponent<Wall>();	
-				if(heightMap.Contains(bounds.min) && heightMap.Contains(bounds.max)){
-					heightMap.SetHigh(x, y);
-				}
-			}
-		}	
+	public BreakableWall SpawnBreakableWall(Vector2 position, GameObject template){
+		BreakableWall breakableWall = GameManager.instantiator.Instantiate(position, template).gameObject.GetComponent<BreakableWall>();
+		heightMap.SetHigh(position.x, position.y);
+		functionalInstances.Add (breakableWall);
+		return breakableWall;
 	}
 
 	public Floor SpawnFloor(Vector2 position, GameObject template){
@@ -76,9 +64,7 @@ public class GameMap
 
 	public Wall SpawnWall(Vector2 position, GameObject template){
 		Wall wall = GameManager.instantiator.Instantiate(position, template).gameObject.GetComponent<Wall>();
-		if (heightMap.Contains (position)) {
-			heightMap.SetHigh (position.x, position.y);
-		}
+		heightMap.SetHigh (position.x, position.y);
 		return wall;
 	}
 

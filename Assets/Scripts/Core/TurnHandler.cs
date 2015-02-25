@@ -32,7 +32,7 @@ public class TurnHandler
 		foreach(Character character in GameManager.gameMap.characterInstances){
 			if(character != GameManager.playerHandler.playerCharacter){
 				if(!GameManager.ai.MoveTowardsEntityIfInView(character, GameManager.playerHandler.playerCharacter, 3)){
-					GameManager.ai.Wander(character, 0.8f);
+					GameManager.ai.Wander(character, 1f);
 				}
 				if(character.isMoving){
 					lastCharacterMoving = character;
@@ -40,6 +40,7 @@ public class TurnHandler
 			}
 		}
 		// Enemies moved, start player turn
+		new WaitForSeconds (0.2f);
 		playerTurn = true;
 	}
 

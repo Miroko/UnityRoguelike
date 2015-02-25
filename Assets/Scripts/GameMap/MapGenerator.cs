@@ -15,6 +15,7 @@ public class MapGenerator
 
 	public GameObject playerTemplate;
 	public GameObject exitTemplate;
+	public GameObject breakableWallTemplate;
 	public GameObject[] enemyTemplates;
 	public GameObject[] itemTemplates;
 	public GameObject[] floorTemplates;
@@ -23,8 +24,9 @@ public class MapGenerator
 
 	public MapGenerator(int width, int height, int seed, int rooms, int corridors, int roomSize, int corridorLenght,
 	                    float enemyChance, float itemChance, int currentLevel,
-	                    GameObject playerTemplate, GameObject exitTemplate, GameObject[] floorTemplates, GameObject[] wallTemplates,
-	                    GameObject[] enemyTemplates, GameObject[] itemTemplates){
+	                    GameObject playerTemplate, GameObject exitTemplate, GameObject breakableWallTemplate,
+	                    GameObject[] floorTemplates, GameObject[] wallTemplates, GameObject[] enemyTemplates,
+	                    GameObject[] itemTemplates){
 		this.width = width;
 		this.height = height;
 		this.seed = seed;
@@ -38,6 +40,7 @@ public class MapGenerator
 
 		this.playerTemplate = playerTemplate;
 		this.exitTemplate = exitTemplate;
+		this.breakableWallTemplate = breakableWallTemplate;
 		this.enemyTemplates = enemyTemplates;
 		this.floorTemplates = floorTemplates;
 		this.wallTemplates = wallTemplates;
@@ -73,9 +76,22 @@ public class MapGenerator
 		}
 		SpawnExit (map, cursorPosition);
 		BuildWalls (map);
+		BuildBreakableWalls (map);
 		SpawnEnemies (map, enemyChance);
 		SpawnItems (map, itemChance);
+		BuildOuterWall (map);
 		return map;
+	}
+
+	private void BuildOuterWall(GameMap map){
+		for (float x = -5; x < map.heightMap.width + 5; x++) {
+			for (float y = -5; y < map.heightMap.height + 5; y++) {
+				if(map.heightMap.Contains(x,y) == false){		
+					Vector2 position = new Vector2(x,y);
+					GameManager.instantiator.Instantiate(position, wallTemplates[0]);
+				}
+			}
+		}
 	}
 
 	private void SpawnExit(GameMap map, Vector2 position){
@@ -89,9 +105,11 @@ public class MapGenerator
 
 	private void BuildCorridor(GameMap map, Vector2 direction, int corridorLenght){
 		foreach (Vector2 position in map.heightMap.LineIterator(cursorPosition, direction, corridorLenght)) {
-			map.heightMap.SetLow (position);
-			map.SpawnFloor (position, floorTemplates [0]);
-			cursorPosition = position;
+			if(map.heightMap.Contains(position.x, position.y)){
+				map.heightMap.SetLow (position);
+				map.SpawnFloor (position, floorTemplates [0]);
+				cursorPosition = position;
+			}
 		}
 		cursorDirection = direction;
 	}
@@ -100,7 +118,7 @@ public class MapGenerator
 		for (float x = position.x - (size/2); x <= position.x + (size/2); x++) {
 			for (float y = position.y - (size/2); y <= position.y + (size/2); y++) {
 				Vector2 floorPosition = new Vector2(x,y);
-				if(map.heightMap.Contains(floorPosition)){
+				if(map.heightMap.Contains(floorPosition.x, floorPosition.y)){
 					map.heightMap.SetLow(floorPosition);
 					map.SpawnFloor(floorPosition, floorTemplates[0]);
 				}
@@ -112,17 +130,41 @@ public class MapGenerator
 	}
 
 	private void BuildWalls(GameMap map){
-		for (float x = -5; x < map.heightMap.width + 5; x++) {
-			for (float y = -5; y < map.heightMap.height + 5; y++) {
+		for (float x = 0; x < map.heightMap.width; x++) {
+			for (float y = 0; y < map.heightMap.height; y++) {
 				Vector2 position = new Vector2(x,y);
-				if(map.heightMap.Contains(position)){
-					if(map.heightMap.IsLow(position) == false){
-						map.SpawnWall(position, wallTemplates[0]);
-					}
-				}
-				else{
+				if(map.heightMap.IsLow(position) == false){
 					map.SpawnWall(position, wallTemplates[0]);
 				}
+			}
+		}
+	}
+
+	private void BuildBreakableWalls(GameMap map){
+		for (float x = 0; x < map.heightMap.width; x++) {
+			for (float y = 0; y < map.heightMap.height; y++) {
+				Vector2 position = new Vector2(x,y);
+				if(map.heightMap.IsLow(position)){
+					if(RandomHelper.Chance(0.6f)){
+						if(map.GetFunctionalsAt(position).Count == 0){
+							int surroundingWalls = 0;
+							for(float surroundingX = x - 1; surroundingX <= x + 1; surroundingX++){
+								for(float surroundingY = y - 1; surroundingY <= y + 1; surroundingY++){
+									if(map.heightMap.Contains(surroundingX, surroundingY)){
+										if(map.heightMap.IsLow(surroundingX, surroundingY) == false){
+											if(map.GetFunctionalsAt(new Vector2(surroundingX, surroundingY)).Count == 0){
+												surroundingWalls++;
+											}
+										}
+									}
+								}
+							}
+							if(surroundingWalls > 3){
+								map.SpawnBreakableWall(position, breakableWallTemplate);
+							}
+						}
+					}
+				}			
 			}
 		}
 	}

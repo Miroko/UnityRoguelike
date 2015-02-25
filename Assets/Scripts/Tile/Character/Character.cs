@@ -26,7 +26,7 @@ public abstract class Character : Tile
 		currentDirection = Direction.Random;
 	}
 
-	public void takeDamage(int amount){
+	public void TakeDamage(int amount){
 		animator.SetTrigger ("onTakeDamage");
 		health -= amount;
 		if (health <= 0) {
@@ -35,9 +35,13 @@ public abstract class Character : Tile
 		}
 	}
 
-	public void attack(Character entity){
+	public void Attack(Tile tile){
 		animator.SetTrigger ("onAttack");
-		entity.takeDamage (damage);
+		if (tile is Character) {
+			((Character)tile).TakeDamage (damage);
+		}else if(tile is BreakableWall){
+			((BreakableWall)tile).TakeDamage(damage);
+		}
 	}
 
 	public bool Move(GameMap map, Vector3 direction){
@@ -45,6 +49,10 @@ public abstract class Character : Tile
 		Vector3 currentPosition = gameObject.transform.position;
 		Vector3 destination = currentPosition + currentDirection;
 		if (map.heightMap.Contains (destination)) {
+			foreach (Functional functional in map.GetFunctionalsAt(destination)) {
+				HandleCollision (functional);	
+				if(functional.Blocks(this)) return false;
+			}
 			if (map.heightMap.IsLow (destination)) {
 				foreach (Character entity in map.GetCharactersAt(destination)) {
 					if (entity != this) {
@@ -53,9 +61,6 @@ public abstract class Character : Tile
 							return false;
 						}
 					}
-				}
-				foreach (Functional functional in map.GetFunctionalsAt(destination)) {
-					HandleCollision (functional);									
 				}
 				foreach (Item item in map.GetItemsAt(destination)) {
 					HandleCollision (item);

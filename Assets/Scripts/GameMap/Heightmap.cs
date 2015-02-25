@@ -65,27 +65,17 @@ public class Heightmap
 	public bool ScanForOpenLine(bool highBreaks, Vector3 from, Vector3 direction, int lenght){
 		Vector3 destination = new Vector2 (from.x + (direction.x * lenght), from.y + (direction.y * lenght));
 		foreach (Vector2 positionOnLine in LineIterator(from, direction, lenght)) {
-			if(Contains(positionOnLine)){
-				if(!IsLow(positionOnLine) == highBreaks){
-					return false;
-				}
-			}
-			else{
+			if(!IsLow(positionOnLine) == highBreaks){
 				return false;
-			}
+			}		
 		}
 		return true;
 	}
 
 	public bool ScanForOpenLine(bool highBreaks, Vector3 from, Vector3 destination){
 		foreach (Vector2 positionOnLine in LineIterator(from, destination)) {
-			if(Contains(positionOnLine)){
-				if(!IsLow(positionOnLine) == highBreaks){				
+			if(!IsLow(positionOnLine) == highBreaks){				
 					return false;
-				}
-			}
-			else{
-				return false;
 			}
 		}
 		return true;
@@ -95,22 +85,22 @@ public class Heightmap
 	public IEnumerable<Vector3> LineIterator(Vector3 from, Vector3 direction, int lenght){
 		Vector3 current = from;
 		Vector3 destination = new Vector2 (from.x + (direction.x * lenght), from.y + (direction.y * lenght));
-		if (Contains (current) && Contains (destination)) {
-			if (Vector3.Distance (from, destination) < maxScanDistance) {
-				while (current != destination) {
-					current = Vector3.MoveTowards (current, destination, 1);				
+		if (Vector3.Distance (from, destination) < maxScanDistance) {
+			while (current != destination) {
+				current = Vector3.MoveTowards (current, destination, 1);				
+				if(Contains(current)){
 					yield return current;	
-				}
+				}	
 			}
 		}
 	}
 
 	public IEnumerable<Vector3> LineIterator(Vector3 from, Vector3 destination){
 		Vector3 current = from;
-		if (Contains (current) && Contains (destination)) {
-			if (Vector3.Distance (from, destination) < maxScanDistance) {
-				while (current != destination) {
-					current = Vector3.MoveTowards (current, destination, 1);				
+		if (Vector3.Distance (from, destination) < maxScanDistance) {
+			while (current != destination) {
+				current = Vector3.MoveTowards (current, destination, 1);		
+				if(Contains(current)){
 					yield return current;	
 				}
 			}
