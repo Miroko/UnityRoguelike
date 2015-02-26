@@ -9,15 +9,13 @@ public abstract class Character : Tile
 	public float movePerSecond;
 	public Animator animator;
 
-
 	[HideInInspector] public Vector3 currentDirection;
+	[HideInInspector] public bool isMoving = false;
 
 	private Vector3 moveDestination;
 	public Vector3 getMoveDestination(){
 		return moveDestination;
 	}
-
-	[HideInInspector] public bool isMoving = false;
 
 	public abstract void HandleCollision (Tile tile);
 

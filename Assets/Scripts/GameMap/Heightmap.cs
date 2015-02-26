@@ -63,7 +63,6 @@ public class Heightmap
 	}
 
 	public bool ScanForOpenLine(bool highBreaks, Vector3 from, Vector3 direction, int lenght){
-		Vector3 destination = new Vector2 (from.x + (direction.x * lenght), from.y + (direction.y * lenght));
 		foreach (Vector2 positionOnLine in LineIterator(from, direction, lenght)) {
 			if(!IsLow(positionOnLine) == highBreaks){
 				return false;
@@ -75,7 +74,7 @@ public class Heightmap
 	public bool ScanForOpenLine(bool highBreaks, Vector3 from, Vector3 destination){
 		foreach (Vector2 positionOnLine in LineIterator(from, destination)) {
 			if(!IsLow(positionOnLine) == highBreaks){				
-					return false;
+				return false;
 			}
 		}
 		return true;

@@ -8,7 +8,7 @@ public class TurnHandler
 	public Character lastCharacterMoving;
 
 	public void PlayTurn(){
-		if (lastCharacterMoving.isMoving == false) {
+		if (lastCharacterMoving == null || lastCharacterMoving.isMoving == false) {
 			if (playerTurn){
 				TakePlayerTurn ();
 			}
@@ -19,12 +19,10 @@ public class TurnHandler
 	}
 
 	private void TakePlayerTurn(){
-		Vector2 moveDirection = GameManager.inputHandler.GetMoveDirection ();
-		if (moveDirection != Vector2.zero) {
-			GameManager.playerHandler.playerCharacter.Move(GameManager.gameMap, moveDirection);
+		if (GameManager.inputHandler.MoveToDirection ()) {
 			lastCharacterMoving = GameManager.playerHandler.playerCharacter;
-			// Player moved, end player turn
-			new WaitForSeconds (0.2f);
+			playerTurn = false;
+		} else if (GameManager.inputHandler.Skip()) {
 			playerTurn = false;
 		}
 	}
@@ -43,7 +41,6 @@ public class TurnHandler
 			}
 		}
 		// Enemies moved, start player turn
-		new WaitForSeconds (0.2f);
 		playerTurn = true;
 	}
 

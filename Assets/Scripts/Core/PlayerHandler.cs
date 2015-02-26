@@ -7,7 +7,6 @@ public class PlayerHandler
 
 	public void SetPlayerCharacter(Player playerCharacter){
 		this.playerCharacter = playerCharacter;
-		GameManager.turnHandler.lastCharacterMoving = playerCharacter;
 	}
 
 }

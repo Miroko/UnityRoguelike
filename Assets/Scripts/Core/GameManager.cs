@@ -3,11 +3,13 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
+	public static GameManager instance;
+
 	public int mapWidth;
 	public int mapHeight;
 
 	public int seed;
-	public int level;
+	public int startLevel;
 
 	public int rooms;
 	public int roomSize;
@@ -28,6 +30,8 @@ public class GameManager : MonoBehaviour {
 	public GameObject[] enemyTemplates;
 	public GameObject[] itemTemplates;
 
+	public UIScript uiScript;
+
 	public static PlayerHandler playerHandler;
 	public static MapGenerator mapGenerator;
 	public static GameMap gameMap;
@@ -37,12 +41,13 @@ public class GameManager : MonoBehaviour {
 	public static Ai ai;
 
 	void Awake(){
+		instance = this;
 		DontDestroyOnLoad (gameObject);
 
 		instantiator = new Instantiator ();		
 		playerHandler = new PlayerHandler ();		
 		mapGenerator = new MapGenerator (mapWidth, mapHeight, seed, rooms, corridors,
-		                                 roomSize, corridorLength, enemyChance, itemChance, level,
+		                                 roomSize, corridorLength, enemyChance, itemChance, startLevel,
 		                                 exitTemplate, breakableWallTemplate, floorTemplates, wallTemplates,
 		                                 enemyTemplates, itemTemplates);		
 		turnHandler = new TurnHandler ();		
@@ -52,21 +57,26 @@ public class GameManager : MonoBehaviour {
 		GameManager.playerHandler.SetPlayerCharacter (player);
 	}
 
-	void Start(){
-		NextLevel ();
+	public void NewGame(){
+		GameManager.playerHandler.playerCharacter.isAlive = true;
+		GameManager.mapGenerator.currentLevel = startLevel;
+		GameManager.playerHandler.playerCharacter.collectedFood = GameManager.playerHandler.playerCharacter.initialCollectedFood;
+		LoadNextLevel ();
 	}
 
 	void OnLevelWasLoaded(int level){
-		gameMap = mapGenerator.NewGameMap (mapGenerator.currentLevel++);
+		gameMap = mapGenerator.NewGameMap (mapGenerator.currentLevel);
 		turnHandler.playerTurn = true;
 	}
 
-	public static void NextLevel(){
+	public void LoadNextLevel(){
 		Application.LoadLevel ("Game");
 	}
 
 	void Update () {
-		turnHandler.PlayTurn ();
+		if (GameManager.playerHandler.playerCharacter.isAlive) {
+			turnHandler.PlayTurn ();
+		}
 	}
 
 }

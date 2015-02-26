@@ -7,10 +7,10 @@ using System.Collections.Generic;
 public class MapGenerator
 {
 	private Vector2 cursorPosition;
-	private Vector2 cursorDirection;
 
 	public  int currentLevel;
-	private int width, height, seed, rooms, corridors, roomSize, corridorLenght;
+	public int seed;
+	private int width, height, rooms, corridors, roomSize, corridorLenght;
 	private float enemyChance, itemChance;
 
 	public GameObject exitTemplate;
@@ -60,7 +60,6 @@ public class MapGenerator
 		float total = roomsToPlace + corridorsToPlace;
 		float left = total;
 		for (int loop = 0; loop < total; loop++) {		
-			float roomPlaceChance = roomsToPlace / left;
 			float corridorPlaceChance = corridorsToPlace / left;
 			float random = UnityEngine.Random.value;
 			if(random <= corridorPlaceChance){
@@ -83,8 +82,8 @@ public class MapGenerator
 	}
 
 	private void BuildOuterWall(GameMap map){
-		for (float x = -5; x < map.heightMap.width + 5; x++) {
-			for (float y = -5; y < map.heightMap.height + 5; y++) {
+		for (float x = -10; x < map.heightMap.width + 10; x++) {
+			for (float y = -10; y < map.heightMap.height + 10; y++) {
 				if(map.heightMap.Contains(x,y) == false){		
 					Vector2 position = new Vector2(x,y);
 					GameManager.instantiator.Instantiate(position, wallTemplates[0]);
@@ -111,7 +110,6 @@ public class MapGenerator
 				cursorPosition = position;
 			}
 		}
-		cursorDirection = direction;
 	}
 
 	private void BuildRoom(GameMap map, Vector2 position, int size){
